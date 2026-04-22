@@ -2,9 +2,9 @@ import flet as ft
 
 def main(page: ft.Page):
     page.title = "收入纳税明细"
-    page.bgcolor = "#F5F6F8" 
-    page.padding = 0         
-    page.theme_mode = ft.ThemeMode.LIGHT 
+    page.bgcolor = "#F5F6F8"
+    page.padding = 0
+    page.theme_mode = ft.ThemeMode.LIGHT
 
     form_rows = []
     cards_ui = []
@@ -58,19 +58,23 @@ def main(page: ft.Page):
             show_display_view(data_list)
 
         page.add(
-            ft.AppBar(title=ft.Text("信息录入", weight=ft.FontWeight.BOLD), center_title=True, bgcolor="white"),
-            ft.Container(
-                padding=15, expand=True,
+            ft.SafeArea(
                 content=ft.Column([
-                    list_column,
-                    ft.Button("➕ 添加月份", on_click=add_row),
-                    ft.Button("生成预览", on_click=generate)
-                ], scroll=ft.ScrollMode.AUTO)
+                    ft.AppBar(title=ft.Text("信息录入", weight=ft.FontWeight.BOLD), center_title=True, bgcolor="white"),
+                    ft.Container(
+                        padding=15, expand=True,
+                        content=ft.Column([
+                            list_column,
+                            ft.Button("➕ 添加月份", on_click=add_row),
+                            ft.Button("生成预览", on_click=generate)
+                        ], scroll=ft.ScrollMode.AUTO)
+                    )
+                ], expand=True)
             )
         )
 
     # =========================
-    # 第二屏（展示页 - 完美复刻版）
+    # 第二屏（展示页）
     # =========================
     def show_display_view(data_list):
         page.clean()
@@ -81,42 +85,44 @@ def main(page: ft.Page):
             show_input_view()
 
         page.add(
-            # 顶部导航栏
-            ft.Container(
-                bgcolor="white",
-                padding=ft.padding.only(left=10, right=15, top=15, bottom=15),
-                content=ft.Row([
-                    ft.GestureDetector(
-                        on_tap=go_back,
+            ft.SafeArea(
+                content=ft.Column([
+                    # 顶部导航栏
+                    ft.Container(
+                        bgcolor="white",
+                        padding=ft.padding.only(left=10, right=15, top=15, bottom=15),
                         content=ft.Row([
-                            ft.Icon(ft.Icons.ARROW_BACK_IOS_NEW, size=18, color="#007AFF"),
-                            ft.Text("返回", color="#007AFF", size=16)
-                        ], spacing=2)
+                            ft.GestureDetector(
+                                on_tap=go_back,
+                                content=ft.Row([
+                                    ft.Icon(ft.Icons.ARROW_BACK_IOS_NEW, size=18, color="#007AFF"),
+                                    ft.Text("返回", color="#007AFF", size=16)
+                                ], spacing=2)
+                            ),
+                            ft.Text("收入纳税明细", size=17, weight=ft.FontWeight.W_500),
+                            ft.Text("批量申诉", color="#007AFF", size=15),
+                        ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
                     ),
-                    ft.Text("收入纳税明细", size=17, weight=ft.FontWeight.W_500),
-                    ft.Text("批量申诉", color="#007AFF", size=15),
-                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN)
-            ),
-
-            # 内容区
-            ft.Column([
-                # 汇总模块
-                ft.Container(
-                    bgcolor="white",
-                    padding=ft.padding.only(left=15, right=15, top=20, bottom=20),
-                    content=ft.Column([
-                        summary_row("收入合计", total_income, True),
-                        ft.Divider(height=1, color="#EEEEEE"),
-                        summary_row("已申报税额合计", total_tax, False),
-                    ], spacing=15)
-                ),
-                
-                # 列表模块
-                ft.Column(
-                    [income_card(d) for d in data_list],
-                    spacing=10 
-                )
-            ], scroll=ft.ScrollMode.AUTO, expand=True)
+                    # 内容区
+                    ft.Column([
+                        # 汇总模块
+                        ft.Container(
+                            bgcolor="white",
+                            padding=ft.padding.only(left=15, right=15, top=20, bottom=20),
+                            content=ft.Column([
+                                summary_row("收入合计", total_income, True),
+                                ft.Divider(height=1, color="#EEEEEE"),
+                                summary_row("已申报税额合计", total_tax, False),
+                            ], spacing=15)
+                        ),
+                        # 列表模块
+                        ft.Column(
+                            [income_card(d) for d in data_list],
+                            spacing=10
+                        )
+                    ], scroll=ft.ScrollMode.AUTO, expand=True)
+                ], expand=True)
+            )
         )
 
     # 单条卡片 UI
@@ -129,9 +135,7 @@ def main(page: ft.Page):
                     ft.Text("工资薪金", size=16, color="#333333"),
                     ft.Text(d["date"], size=16, color="#333333"),
                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN),
-                
-                ft.Container(height=2), 
-                
+                ft.Container(height=2),
                 build_row("所得项目小类", d["type"]),
                 build_row("扣缴义务人", d["company"], True),
                 build_row("收入", f"{d['income']:,.2f}元"),
@@ -153,7 +157,6 @@ def main(page: ft.Page):
         return ft.Row([
             ft.Text(label, color="#333333", size=15),
             ft.Container(width=5),
-            # ✅ 修复区域：使用 Row 和 CrossAxisAlignment 来实现绝对居中，避开报错
             ft.Container(
                 content=ft.Row(
                     [ft.Text("?", color="#007AFF", size=11, weight=ft.FontWeight.BOLD)],
